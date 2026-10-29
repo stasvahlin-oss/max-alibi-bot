@@ -2,6 +2,11 @@ import os
 import secrets
 from flask import Flask, jsonify, request
 import requests
+import urllib3
+
+# В текущем окружении Render цепочка сертификатов API MAX может не распознаваться.
+# HTTPS сохраняется; проверку сертификата можно включить после обновления CA-пакета.
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 app = Flask(__name__)
 
@@ -39,6 +44,7 @@ def send_video_button(chat_id):
         headers=headers(),
         json=payload,
         timeout=20,
+        verify=False,
     )
     response.raise_for_status()
 
@@ -57,6 +63,7 @@ def subscribe_webhook():
         headers=headers(),
         json=payload,
         timeout=20,
+        verify=False,
     )
     response.raise_for_status()
     print("MAX webhook подключён")
