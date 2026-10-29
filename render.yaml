@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: max-alibi-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
+    envVars:
+      - key: MAX_BOT_TOKEN
+        sync: false
+      - key: PUBLIC_URL
+        sync: false
+      - key: VIDEO_URL
+        value: https://drive.google.com/file/d/1ibGA1boWD_SFYUaoKAqytrPniOEZV5y-/view?usp=sharing
+      - key: WEBHOOK_SECRET
+        sync: false
