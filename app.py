@@ -14,25 +14,32 @@ MAX_API = "https://platform-api2.max.ru"
 BOT_TOKEN = os.environ.get("MAX_BOT_TOKEN", "")
 PUBLIC_URL = os.environ.get("PUBLIC_URL", "").rstrip("/")
 WEBHOOK_SECRET = os.environ.get("WEBHOOK_SECRET", "")
-VIDEO_URL = os.environ.get(
-    "VIDEO_URL",
-    "https://drive.google.com/file/d/1ibGA1boWD_SFYUaoKAqytrPniOEZV5y-/view?usp=sharing",
+CODE_WORD = os.environ.get("CODE_WORD", "ДУГЛАС").strip().casefold()
+CODE_WORD_1 = os.environ.get("CODE_WORD_1", "Уралмаш").strip().casefold()
+MATERIAL_URL_1 = os.environ.get(
+    "MATERIAL_URL_1",
+    "https://drive.google.com/drive/folders/1k5aar25pinTATKglNnqSuWxJWRejNRRn?usp=drive_link",
 )
+CODE_WORD_2 = os.environ.get("CODE_WORD_2", "Берия").strip().casefold()
+MATERIAL_URL_2 = os.environ.get(
+    "MATERIAL_URL_2",
+    "https://drive.google.com/drive/folders/1qz25PKYl5GboxGCbekJOkYw2julhXjho?usp=drive_link",
+).strip()
 
 
 def headers():
     return {"Authorization": BOT_TOKEN, "Content-Type": "application/json"}
 
 
-def send_video_button(chat_id):
+def send_material_button(chat_id, material_url):
     payload = {
-        "text": "Видео для раунда:",
+        "text": "Материал для раунда:",
         "attachments": [
             {
                 "type": "inline_keyboard",
                 "payload": {
                     "buttons": [[
-                        {"type": "link", "text": "Открыть видео", "url": VIDEO_URL}
+                        {"type": "link", "text": "Открыть материал", "url": material_url}
                     ]]
                 },
             }
@@ -95,9 +102,15 @@ def webhook():
     text = (body.get("text") or "").strip().casefold()
     chat_id = (message.get("recipient") or {}).get("chat_id")
 
-    if text == "дуглас" and chat_id is not None:
+    material_url = None
+    if text == CODE_WORD_1:
+        material_url = MATERIAL_URL_1
+    elif CODE_WORD_2 and text == CODE_WORD_2:
+        material_url = MATERIAL_URL_2
+
+    if material_url and chat_id is not None:
         try:
-            send_video_button(chat_id)
+            send_material_button(chat_id, material_url)
         except Exception as exc:
             print(f"Ошибка отправки сообщения MAX: {exc}")
             return jsonify({"ok": False}), 500
